@@ -1,33 +1,28 @@
-const db = require('../models');
+const { detail_transaction: DetailTransaction, product: Product, transaction: Transaction } = require('../models');
 
-const getDetailTransactions = async (req, res) => {
-  try {
-    const detailTransactions = await db.detail_transaction.findAll({
-      include: [db.product, db.transaction]
-    });
-    res.status(200).json(detailTransactions);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
-const getDetailTransactionById = async (req, res) => {
+const getDetailTransactionsByTransactionId = async (req, res) => {
   try {
-    const { id } = req.params;
-    const detailTransaction = await db.detail_transaction.findByPk(id, {
-      include: [db.product, db.transaction]
+    const { idTransaction } = req.params;
+    const detailTransactions = await DetailTransaction.findAll({
+      where: { id_transaction: idTransaction },
+      include: [
+        { model: Product, as: 'product' },
+        { model: Transaction, as: 'transaction' }
+      ]
     });
-    if (detailTransaction) {
-      res.status(200).json(detailTransaction);
-    } else {
-      res.status(404).json({ error: 'Detail Transaction not found' });
+
+    if (!detailTransactions.length) {
+      return res.status(404).json({ error: 'Detail Transaction not found' });
     }
+
+    res.json(detailTransactions);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
 module.exports = {
-  getDetailTransactions,
-  getDetailTransactionById
+  getDetailTransactionsByTransactionId,
 };
