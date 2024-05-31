@@ -7,7 +7,7 @@ const createTransaction = async (req, res) => {
     const { date, details } = req.body;
 
     // Buat transaksi baru
-    const newTransaction = await db.transaction.create({ date }, { transaction });
+    const newTransaction = await db.transaction.create({ date });
 
     // Buat detail transaksi baru
     const detailTransactions = details.map(detail => ({
